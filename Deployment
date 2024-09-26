@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: example
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: example
+        component: example
+    spec:
+      containers:
+      - name: example
+        image: example
+        ports:
+           - containerPort: 8080
+        resources:
+          limits:
+            cpu: "4"
+            memory: 12Gi
+          requests:
+            cpu: "1"
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /dev/shm
+          name: dshm
+        - mountPath: /usr/src/app
+          name: example-volume
+      imagePullSecrets:
+      - name: image-example-registry
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: dshm
+        - name: example-volume
+          persistentVolumeClaim:
+            claimName: example-volume
